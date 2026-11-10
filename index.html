@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Special Surprise For You ❤️</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            purple: {
+              50: '#faf5ff',
+              100: '#f3e8ff',
+              200: '#e9d5ff',
+              300: '#d8b4fe',
+              400: '#c084fc',
+              500: '#a855f7',
+              600: '#9333ea',
+              700: '#7e22ce',
+            },
+            romantic: {
+              bg: '#fcf7ff',
+              card: '#ffffff',
+              accent: '#a855f7',
+              gold: '#d4af37'
+            }
+          },
+          fontFamily: {
+            handwriting: ['"Dancing Script"', 'cursive'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #fcf7ff; /* Purple Light Background */
+      overflow-x: hidden;
+    }
+    
+    .font-cursive {
+      font-family: 'Dancing Script', cursive;
+    }
+
+    /* Floating Hearts Animation */
+    @keyframes floatUp {
+      0% {
+        transform: translateY(100vh) scale(0.3) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) scale(1.2) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .heart-particle {
+      position: fixed;
+      pointer-events: none;
+      z-index: 50;
+      animation: floatUp 6s linear infinite;
+    }
+
+    /* Flip Card Effects */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .transform-style-3d {
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+    }
+
+    /* Shake Animation for Wrong Passcode */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-10px); }
+      40%, 80% { transform: translateX(10px); }
+    }
+    .animate-shake {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    /* Scratch Card Canvas styling */
+    #scratchCanvas {
+      touch-action: none;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f3e8ff;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #c084fc;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between">
+
+  <!-- Floating Hearts Background Container -->
+  <div id="heartsContainer" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
+
+  <!-- Audio Player Controller -->
+  <div class="fixed top-4 right-4 z-40 flex items-center gap-2 bg-white/80 backdrop-blur-md px-3 py-2 rounded-full shadow-md border border-purple-100 text-xs font-medium">
+    <button id="musicToggleBtn" onclick="toggleMusic()" class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center shadow hover:bg-purple-700 transition duration-200">
+      <i id="musicIcon" class="fa-solid fa-music"></i>
+    </button>
+    <span id="musicStatus" class="text-purple-600 font-semibold pr-1">Play Music</span>
+  </div>
+
+  <!-- Background Music Audio Tag -->
+  <audio id="bgMusic" loop>
+    <source src="C:\Users\legion go\Desktop\Digital Gift\Music\Adie - Paraluman (Official Audio).mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- ==================== SCREEN 1: PASSCODE LOCK ==================== -->
+  <div id="lockScreen" class="relative z-10 min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-white/90 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl border border-purple-100 text-center">
+      
+      <!-- Romantic Icon Header -->
+      <div class="relative w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+        <div class="absolute inset-0 bg-purple-200 rounded-full animate-ping opacity-30"></div>
+        <div class="w-16 h-16 bg-gradient-to-tr from-purple-600 to-purple-400 rounded-full flex items-center justify-center text-white text-2xl shadow-lg">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+      </div>
+
+      <h1 class="text-2xl font-bold text-slate-800 mb-1">Welcome My Love! ❤️</h1>
+      <p class="text-xs text-purple-600 font-medium mb-6">Enter our special PIN to unlock your surprise gift</p>
+
+      <!-- Security Question / Hint -->
+      <div class="bg-purple-50 p-3 rounded-xl border border-purple-100 mb-6 text-xs text-purple-700">
+        <i class="fa-regular fa-lightbulb text-purple-500 mr-1"></i>
+        <span><strong>Hint:</strong> Our Anniversary Date (MMDDYY)</span>
+      </div>
+
+      <!-- PIN Input Display Dots -->
+      <div id="pinDotsContainer" class="flex justify-center gap-3 mb-8">
+        <div class="pin-dot w-4 h-4 rounded-full border-2 border-purple-300 bg-transparent transition-all"></div>
+        <div class="pin-dot w-4 h-4 rounded-full border-2 border-purple-300 bg-transparent transition-all"></div>
+        <div class="pin-dot w-4 h-4 rounded-full border-2 border-purple-300 bg-transparent transition-all"></div>
+        <div class="pin-dot w-4 h-4 rounded-full border-2 border-purple-300 bg-transparent transition-all"></div>
+        <div class="pin-dot w-4 h-4 rounded-full border-2 border-purple-300 bg-transparent transition-all"></div>
+        <div class="pin-dot w-4 h-4 rounded-full border-2 border-purple-300 bg-transparent transition-all"></div>
+      </div>
+
+      <!-- Keypad -->
+      <div class="grid grid-cols-3 gap-3 max-w-[240px] mx-auto mb-4">
+        <button onclick="pressKey('1')" class="h-12 rounded-xl bg-purple-50 hover:bg-purple-100 active:scale-95 text-slate-700 font-semibold text-lg shadow-sm border border-purple-100 transition">1</button>
+        <button onclick="pressKey('2')" class="h-12 rounded-xl bg-purple-50 hover:bg-purple-100 active:scale-95 text-slate-700 font-semibold text-lg shadow-sm border border-purple-100 transition">2</button>
+        <button onclick="pressKey('3')" class="h-12 rounded-xl bg-purple-50 hover:bg-purple-100 active:scale-95 text-slate-700 font-semibold text-lg shadow-sm border border-purple-100 transition">3</button>
+        <button onclick="pressKey('4')" class="h-12 rounded-xl bg-purple-50 hover:bg-purple-100 active:scale-95 text-slate-700 font-semibold text-lg shadow-sm border border-purple-100 transition">4</button>
+        <button onclick="pressKey('5')" class="h-12 rounded-xl bg-purple-50 hover:bg-purple-100 active:scale-95 text-slate-700 font-semibold text-lg shadow-sm border border-purple-100 transition">5</button>
+        <button onclick="pressKey('6')" class="h-12 rounded-xl bg-purple-50 hover:bg-purple-100 active:scale-95 text-slate-700 font-semibold text-lg shadow-sm border border-purple-100 transition">6</button>
+        <button onclick="pressKey('7')" class="h-12 rounded-xl bg-purple-50 hover:bg-purple-100 active:scale-95 text-slate-700 font-semibold text-lg shadow-sm border border-purple-100 transition">7</button>
+        <button onclick="pressKey('8')" class="h-12 rounded-xl bg-purple-50 hover:bg-purple-100 active:scale-95 text-slate-700 font-semibold text-lg shadow-sm border border-purple-100 transition">8</button>
+        <button onclick="pressKey('9')" class="h-12 rounded-xl bg-purple-50 hover:bg-purple-100 active:scale-95 text-slate-700 font-semibold text-lg shadow-sm border border-purple-100 transition">9</button>
+        <button onclick="clearPin()" class="h-12 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-500 font-semibold text-xs shadow-sm transition">CLR</button>
+        <button onclick="pressKey('0')" class="h-12 rounded-xl bg-purple-50 hover:bg-purple-100 active:scale-95 text-slate-700 font-semibold text-lg shadow-sm border border-purple-100 transition">0</button>
+        <button onclick="deleteKey()" class="h-12 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-500 font-semibold text-sm shadow-sm transition"><i class="fa-solid fa-backspace"></i></button>
+      </div>
+
+      <!-- Feedback message -->
+      <p id="lockFeedback" class="text-xs text-purple-600 font-medium h-4"></p>
+    </div>
+  </div>
+
+
+  <!-- ==================== SCREEN 2: MAIN GIFT CONTENT ==================== -->
+  <div id="mainContent" class="hidden relative z-10 min-h-screen py-10 px-4 max-w-xl mx-auto">
+    
+    <!-- Welcome Header -->
+    <header class="text-center mb-10">
+      <span class="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold tracking-wider uppercase mb-2">Happy Birthday! 🎂✨</span>
+      <h1 class="text-4xl sm:text-5xl font-bold font-cursive text-purple-600 mb-2">To My Dearest Wife</h1>
+      <p class="text-slate-600 text-sm">Thank you for being my today and all of my tomorrows.</p>
+    </header>
+
+    <!-- SECTION 1: Interactive Memory Photo Cards Grid -->
+    <section class="mb-12">
+      <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-images text-purple-500"></i> Our Precious Moments 
+        <span class="text-xs text-purple-400 font-normal">(Tap cards to flip!)</span>
+      </h2>
+
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Photo Card 1 -->
+        <div class="perspective-1000 h-48 cursor-pointer" onclick="flipCard(this)">
+          <div class="card-inner relative w-full h-full transform-style-3d rounded-2xl shadow-md border border-purple-100">
+            <!-- Front (Naka-taob Cover Purple) -->
+            <div class="absolute inset-0 backface-hidden bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl p-4 text-white flex flex-col justify-center items-center text-center shadow-sm">
+              <i class="fa-solid fa-heart text-3xl mb-2 text-purple-200 animate-pulse"></i>
+              <p class="text-xs font-bold uppercase tracking-wider">Tap to Flip 🔓</p>
+              <p class="text-[10px] text-purple-100 mt-1">Where It All Began 📍</p>
+            </div>
+            <!-- Back (Litrato) -->
+            <div class="absolute inset-0 backface-hidden rotate-y-180 bg-purple-50 rounded-2xl p-2 flex flex-col justify-between overflow-hidden">
+              <img src="C:\Users\legion go\Desktop\Digital Gift\Pictures\picture1.jpg" alt="Memory 1" class="w-full h-32 object-contain rounded-xl bg-purple-50" onerror="this.src='https://placehold.co/400x300/c084fc/ffffff?text=Our+Memory+1'">
+              <div class="text-center py-1">
+                <p class="text-xs font-bold text-slate-700">Where It All Began 📍</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Photo Card 2 -->
+        <div class="perspective-1000 h-48 cursor-pointer" onclick="flipCard(this)">
+          <div class="card-inner relative w-full h-full transform-style-3d rounded-2xl shadow-md border border-purple-100">
+            <!-- Front (Naka-taob Cover Purple) -->
+            <div class="absolute inset-0 backface-hidden bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl p-4 text-white flex flex-col justify-center items-center text-center shadow-sm">
+              <i class="fa-solid fa-plane-departure text-3xl mb-2 text-purple-200 animate-bounce"></i>
+              <p class="text-xs font-bold uppercase tracking-wider">Tap to Flip 🔓</p>
+              <p class="text-[10px] text-purple-100 mt-1">Sweet Escapes ✈️</p>
+            </div>
+            <!-- Back (Litrato) -->
+            <div class="absolute inset-0 backface-hidden rotate-y-180 bg-purple-50 rounded-2xl p-2 flex flex-col justify-between overflow-hidden">
+              <img src="C:\Users\legion go\Desktop\Digital Gift\Pictures\picture2.jpg" alt="Memory 2" class="w-full h-32 object-contain rounded-xl bg-purple-50" onerror="this.src='https://placehold.co/400x300/c084fc/ffffff?text=Our+Memory+2'">
+              <div class="text-center py-1">
+                <p class="text-xs font-bold text-slate-700">Sweet Escapes ✈️</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: Romantic Voice/Audio Message Mock -->
+    <section class="mb-12">
+      <div class="bg-white/90 backdrop-blur-md p-5 rounded-2xl shadow-md border border-purple-100">
+        <h3 class="text-sm font-bold text-slate-800 mb-2 flex items-center gap-2">
+          <i class="fa-solid fa-microphone-lines text-purple-500"></i> A Special Audio Note 🎙️
+        </h3>
+        <p class="text-xs text-slate-500 mb-4">Press play to listen to my voice message for you:</p>
+
+        <div class="flex items-center gap-3 bg-purple-50 p-3 rounded-xl border border-purple-100">
+          <button onclick="toggleVoiceNote()" class="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center shadow hover:bg-purple-700 transition">
+            <i id="voicePlayIcon" class="fa-solid fa-play"></i>
+          </button>
+          <div class="flex-1">
+            <div class="h-2 bg-purple-200 rounded-full overflow-hidden">
+              <div id="voiceProgressBar" class="w-0 h-full bg-purple-600 transition-all duration-300"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-purple-700 mt-1 font-semibold">
+              <span id="voiceTime">0:00</span>
+              <span>5:22</span>
+            </div>
+          </div>
+        </div>
+
+        <audio id="voiceNoteAudio">
+          <source src="C:\Users\legion go\Desktop\Digital Gift\Music\Adie - Paraluman (Official Audio).mp3" type="audio/mpeg">
+        </audio>
+      </div>
+    </section>
+
+    <!-- SECTION 3: Birthday Message & Video -->
+    <section class="mb-12">
+      <div class="bg-gradient-to-b from-white to-purple-50/50 p-6 sm:p-8 rounded-3xl shadow-xl border border-purple-100 relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-purple-200/30 rounded-full blur-2xl"></div>
+        <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-300/20 rounded-full blur-2xl"></div>
+        
+        <h2 class="text-2xl font-bold font-cursive text-purple-600 mb-4 text-center">My Love Letter To You 💌</h2>
+        
+        <div class="space-y-4 text-slate-700 text-sm leading-relaxed font-sans">
+          <p>Mahal kong misis,</p>
+          <p>
+            Sa espesyal na araw na ito, sa pagdiriwang mo ng iyong kaarawan ngayong December 8, 
+            gusto ko munang magpasalamat sa Diyos dahil ibinigay ka sa akin. Ikaw ang 
+            nagbibigay ng liwanag at saya sa bawat araw ng buhay ko.
+          </p>
+          <p>
+            Maraming salamat sa walang sawang pag-aalaga, pagmamahal, at pag-unawa mo sa 
+            akin. Kahit minsan may mga pagsubok o tambak na bayarin at kahit lagi 
+            tayo nag-aaway haha! 😂, ikaw at ikaw pa rin ang gustong kong makasama sa bawat taon na darating.
+          </p>
+          <p>
+            Sana ay matupad mo lahat ng pangarap mo. Nandito lang ako lagi 
+            para suportahan at mahalin ka habambuhay.
+          </p>
+          <p class="font-semibold text-purple-600">
+            Enjoy your special day, mommy! I love you so much! ❤️
+          </p>
+        </div>
+
+        <!-- Video Player -->
+        <div class="mt-6">
+          <p class="text-xs font-bold text-purple-600 mb-2 flex items-center gap-1">
+            <i class="fa-solid fa-video"></i> A Special Video For You 🎥
+          </p>
+          <video width="100%" controls class="rounded-2xl shadow-md border border-purple-100 bg-black">
+            <source src="C:\Users\legion go\Desktop\Digital Gift\Pictures\video1.mp4" type="video/mp4">
+            Hindi suportado ng browser mo ang video.
+          </video>
+        </div>
+
+        <div class="mt-6 text-right font-cursive text-xl text-purple-600">
+          Forever Yours,<br>
+          <span class="font-bold">Your Loving Husband 😜</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: Interactive Scratch Card Surprise Gift -->
+    <section class="mb-12">
+      <div class="bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-lg border border-purple-100 text-center">
+        <h3 class="text-lg font-bold text-slate-800 mb-1">Scratch To Reveal Your Gift! 🎁</h3>
+        <p class="text-xs text-slate-500 mb-4">Use your finger or mouse to scratch the card below</p>
+
+        <div class="relative w-64 h-36 mx-auto rounded-2xl overflow-hidden shadow-md">
+          <!-- Revealable Content Behind Scratch Layer -->
+          <div class="absolute inset-0 bg-gradient-to-r from-purple-100 via-amber-100 to-purple-100 flex flex-col items-center justify-center p-4 border-2 border-purple-200 rounded-2xl">
+            <!-- Gumagalaw na Pera Icon -->
+            <i class="fa-solid fa-money-bill-wave text-3xl text-emerald-600 mb-1 animate-bounce"></i>
+            <span class="text-xs text-slate-500 uppercase font-semibold">Special Surprise Present</span>
+            <span class="text-sm font-bold text-purple-700 mt-1">💵 Cash Allowance 10k 💵</span>
+          </div>
+
+          <!-- Scratch Canvas Overlay (Purple Layer) -->
+          <canvas id="scratchCanvas" width="256" height="144" class="absolute inset-0 cursor-pointer rounded-2xl"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer Note -->
+    <footer class="text-center text-xs text-purple-400 pb-6">
+      Made with ❤️ specially for you mommy
+    </footer>
+
+  </div>
+
+  <script>
+    // Configurable Correct Passcode (Anniversary PIN: MMDDYY e.g., 061823)
+    const CORRECT_PIN = "061823";
+    let enteredPin = "";
+
+    // 1. PIN Keypad Logic
+    function pressKey(num) {
+      if (enteredPin.length < 6) {
+        enteredPin += num;
+        updatePinDots();
+      }
+      
+      if (enteredPin.length === 6) {
+        checkPin();
+      }
+    }
+
+    function deleteKey() {
+      if (enteredPin.length > 0) {
+        enteredPin = enteredPin.slice(0, -1);
+        updatePinDots();
+      }
+    }
+
+    function clearPin() {
+      enteredPin = "";
+      updatePinDots();
+    }
+
+    function updatePinDots() {
+      const dots = document.querySelectorAll('.pin-dot');
+      dots.forEach((dot, index) => {
+        if (index < enteredPin.length) {
+          dot.classList.remove('bg-transparent', 'border-purple-300');
+          dot.classList.add('bg-purple-600', 'border-purple-600');
+        } else {
+          dot.classList.remove('bg-purple-600', 'border-purple-600');
+          dot.classList.add('bg-transparent', 'border-purple-300');
+        }
+      });
+    }
+
+    function checkPin() {
+      const lockFeedback = document.getElementById('lockFeedback');
+      const lockScreen = document.getElementById('lockScreen');
+
+      if (enteredPin === CORRECT_PIN) {
+        lockFeedback.innerText = "Correct! Unlocking your gift... ❤️";
+        lockFeedback.className = "text-xs text-emerald-500 font-bold h-4";
+
+        setTimeout(() => {
+          lockScreen.classList.add('hidden');
+          document.getElementById('mainContent').classList.remove('hidden');
+          // Auto play music upon unlock
+          playMusic();
+          // Initialize scratch card canvas
+          initScratchCard();
+        }, 800);
+      } else {
+        lockFeedback.innerText = "Oops! Wrong passcode. Try again babe! ❌";
+        lockFeedback.className = "text-xs text-purple-600 font-bold h-4";
+        
+        // Shake animation
+        const lockCard = lockScreen.querySelector('.max-w-sm');
+        lockCard.classList.add('animate-shake');
+        setTimeout(() => lockCard.classList.remove('animate-shake'), 400);
+
+        // Reset pin
+        setTimeout(() => {
+          clearPin();
+        }, 1000);
+      }
+    }
+
+    // 2. Music Player Controller
+    const bgMusic = document.getElementById('bgMusic');
+    const musicIcon = document.getElementById('musicIcon');
+    const musicStatus = document.getElementById('musicStatus');
+    let isPlaying = false;
+
+    function playMusic() {
+      bgMusic.play().then(() => {
+        isPlaying = true;
+        musicIcon.className = "fa-solid fa-pause";
+        musicStatus.innerText = "Pause Music";
+      }).catch(err => {
+        console.log("Audio play deferred until user interaction.");
+      });
+    }
+
+    function toggleMusic() {
+      if (isPlaying) {
+        bgMusic.pause();
+        musicIcon.className = "fa-solid fa-music";
+        musicStatus.innerText = "Play Music";
+        isPlaying = false;
+      } else {
+        playMusic();
+      }
+    }
+
+    // 3. Photo Card Flip
+    function flipCard(cardContainer) {
+      const cardInner = cardContainer.querySelector('.card-inner');
+      cardInner.classList.toggle('rotate-y-180');
+    }
+
+    // 4. Voice Note Audio Toggle
+    const voiceNoteAudio = document.getElementById('voiceNoteAudio');
+    const voicePlayIcon = document.getElementById('voicePlayIcon');
+    const voiceProgressBar = document.getElementById('voiceProgressBar');
+    const voiceTime = document.getElementById('voiceTime');
+
+    function toggleVoiceNote() {
+      if (voiceNoteAudio.paused) {
+        voiceNoteAudio.play();
+        voicePlayIcon.className = "fa-solid fa-pause";
+      } else {
+        voiceNoteAudio.pause();
+        voicePlayIcon.className = "fa-solid fa-play";
+      }
+    }
+
+    voiceNoteAudio.addEventListener('timeupdate', () => {
+      const percentage = (voiceNoteAudio.currentTime / voiceNoteAudio.duration) * 100;
+      voiceProgressBar.style.width = percentage + '%';
+
+      let secs = Math.floor(voiceNoteAudio.currentTime);
+      let mins = Math.floor(secs / 60);
+      secs = secs % 60;
+      voiceTime.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    });
+
+    voiceNoteAudio.addEventListener('ended', () => {
+      voicePlayIcon.className = "fa-solid fa-play";
+      voiceProgressBar.style.width = '0%';
+      voiceTime.innerText = "0:00";
+    });
+
+    // 5. Floating Hearts Animation Background
+    function createHeart() {
+      const heartsContainer = document.getElementById('heartsContainer');
+      const heart = document.createElement('div');
+      heart.className = 'heart-particle text-purple-300/60';
+      
+      const icons = ['fa-heart', 'fa-sparkles', 'fa-gift'];
+      const chosenIcon = icons[Math.floor(Math.random() * icons.length)];
+      heart.innerHTML = `<i class="fa-solid ${chosenIcon}"></i>`;
+      
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.fontSize = (Math.random() * 16 + 10) + 'px';
+      heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+      
+      heartsContainer.appendChild(heart);
+
+      setTimeout(() => {
+        heart.remove();
+      }, 7000);
+    }
+
+    setInterval(createHeart, 600);
+
+    // 6. Scratch Card Implementation (Purple Overlay)
+    function initScratchCard() {
+      const canvas = document.getElementById('scratchCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      // Cover with purple overlay layer
+      ctx.fillStyle = '#a855f7';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Add text label on top of scratch overlay
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 14px "Plus Jakarta Sans", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('✨ Scratch Here to Reveal Gift ✨', canvas.width / 2, canvas.height / 2 + 5);
+
+      let isDrawing = false;
+
+      function scratch(e) {
+        if (!isDrawing) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, 18, 0, Math.PI * 2, false);
+        ctx.fill();
+      }
+
+      canvas.addEventListener('mousedown', (e) => { isDrawing = true; scratch(e); });
+      canvas.addEventListener('mousemove', scratch);
+      canvas.addEventListener('mouseup', () => { isDrawing = false; });
+
+      canvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); });
+      canvas.addEventListener('touchmove', scratch);
+      canvas.addEventListener('touchend', () => { isDrawing = false; });
+    }
+  </script>
+</body>
+</html>
